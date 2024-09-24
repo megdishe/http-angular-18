@@ -25,19 +25,20 @@ app.get("/api/places", async (req, res) => {
 
   const placesData = JSON.parse(fileContent);
 
-  //res.status(200).json({ places: placesData });
-  res.status(500).json({message: 'provoked error'});
+  res.status(200).json({places: placesData});
+  //res.status(500).json({message: 'provoked error'});
 });
 
 app.get("/api/user-places", async (req, res) => {
   const fileContent = await fs.readFile("./data/user-places.json");
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   const places = JSON.parse(fileContent);
 
   res.status(200).json({places});
 });
 
-app.put("//ap/user-places", async (req, res) => {
+app.put("/api/user-places", async (req, res) => {
   const placeId = req.body.placeId;
 
   const fileContent = await fs.readFile("./data/places.json");
@@ -58,7 +59,7 @@ app.put("//ap/user-places", async (req, res) => {
     "./data/user-places.json",
     JSON.stringify(updatedUserPlaces)
   );
-
+  // res.status(500).json({message: 'provoked error'});
   res.status(200).json({userPlaces: updatedUserPlaces});
 });
 
