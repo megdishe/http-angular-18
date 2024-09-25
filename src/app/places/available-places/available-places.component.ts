@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, DestroyRef, inject, OnInit} from '@angular/core';
 import {PlacesComponent} from '../places.component';
 import {PlacesContainerComponent} from '../places-container/places-container.component';
 import {PlacesService} from "../places.service";
@@ -12,24 +12,28 @@ import {SpinnerComponent} from "../../shared/spinner/spinner.component";
   standalone: true,
   templateUrl: './available-places.component.html',
   styleUrl: './available-places.component.css',
-  providers:[SpinnerService],
+  providers: [SpinnerService],
   imports: [PlacesComponent, PlacesContainerComponent, SpinnerComponent]
 })
 export class AvailablePlacesComponent implements OnInit {
 
   private placesService = inject(PlacesService);
-  places = this.placesService.loadedAvailablePlaces;
   private errorService = inject(ErrorService);
   private spinnerService = inject(SpinnerService);
+  private destroyRef = inject(DestroyRef);
+
   showSpinner = this.spinnerService.show;
+  places = this.placesService.loadedAvailablePlaces;
+
 
   ngOnInit(): void {
     this.spinnerService.showSpinner();
-    this.placesService.loadAvailablePlaces()
+    let subscription = this.placesService.loadAvailablePlaces()
       .subscribe({
         error: (error) => this.errorService.showError(error.message),
         complete: () => this.spinnerService.hideSpinner()
       });
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   onSelectPlace(place: Place) {
